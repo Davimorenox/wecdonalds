@@ -108,6 +108,7 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(36px,5vw,52px);lin
 .combo{margin-top:56px;background:var(--red);color:var(--cream);border-radius:30px;padding:26px;display:grid;gap:18px;position:relative;overflow:hidden;box-shadow:0 10px 0 var(--red-deep)}
 .combo .rays{width:1400px;height:1400px;margin:-700px 0 0 -700px;opacity:.6}
 .combo>*{position:relative}
+.combo>.rays{position:absolute}
 .combo h2{color:var(--yellow);text-shadow:3px 3px 0 var(--red-deep)}
 .combo .note{color:var(--yellow-lt)}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -191,6 +192,21 @@ a.btn{display:inline-block;text-decoration:none;text-align:center}
 .mini-ando{width:90px;justify-self:center}
 .field small{font-weight:500;color:var(--muted)}
 @media (max-width:760px){.andoboy{grid-template-columns:1fr}}
+.howto{padding-block:30px 0}
+.how{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.how li{background:var(--cream);border-radius:18px;padding:14px 16px;display:grid;gap:2px;font-size:15px;color:var(--muted);box-shadow:0 5px 0 var(--red-dk);position:relative}
+.how b{font-family:var(--display);font-weight:400;font-size:21px;color:var(--ink)}
+.how em{font-style:normal;font-weight:800;color:var(--red)}
+.how .n{position:absolute;right:12px;top:10px;width:30px;height:30px;border-radius:50%;background:var(--red);color:var(--cream);display:grid;place-items:center;font-weight:800}
+.addcta{margin-top:10px;display:block;text-align:center;background:var(--red);color:var(--cream);font-weight:800;font-size:16px;padding:10px;border-radius:12px;box-shadow:0 4px 0 var(--red-deep)}
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--red-deep);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -6px 0 rgba(94,5,8,.25);animation:barin .35s cubic-bezier(.3,1.4,.6,1)}
+@keyframes barin{from{transform:translateY(100%)}}
+.cartbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.cb-view{flex:1;min-width:0;background:none;border:0;color:var(--yellow-lt);text-align:left;cursor:pointer;display:grid;font-size:15px;font-weight:700}
+.cb-view b{color:var(--yellow);font-family:var(--display);font-weight:400;font-size:20px}
+.cartbar .btn{padding:12px 20px;font-size:17px;white-space:nowrap}
+body.hasbar{padding-bottom:84px}
+@media (max-width:760px){.how{grid-template-columns:1fr 1fr}.combo{padding:18px}.combo .combofoot{flex-direction:column;align-items:stretch;text-align:center}.combo .combofoot .btn{width:100%}.step{padding:12px}}
 html.calm *{animation:none!important;transition:none!important}
 </style>
 </head>
@@ -234,7 +250,7 @@ html.calm *{animation:none!important;transition:none!important}
       <div>
         <h1>O hambúrguer que <span>vale um W!</span></h1>
         <p>Lanches feitos na hora, batata crocante e bebida gelada. Monte seu combo, ajuste do seu jeito e pague no Pix.</p>
-        <div class="ctas"><button class="btn" id="hero-combo">Montar meu combo</button><button class="btn ghost" id="hero-menu">Ver cardápio</button></div>
+        <div class="ctas"><button class="btn" id="hero-menu">Fazer meu pedido</button><button class="btn ghost" id="hero-combo">Montar combo</button></div>
       </div>
       <div class="stage">
         <div class="ring" aria-hidden="true"></div>
@@ -254,6 +270,16 @@ html.calm *{animation:none!important;transition:none!important}
 
 <div class="dots">
   <div class="wrap"><ul class="feats" aria-label="Destaques"><li><b>Feito na hora</b>Montado quando você pede</li><li><b>Pix na hora</b>Pague pelo app do seu banco</li><li><b>Entrega por Andoboy</b>Levamos a pé até você</li></ul></div>
+
+  <section class="wrap howto" aria-labelledby="howto-title">
+    <h2 id="howto-title">Como pedir</h2>
+    <ol class="how">
+      <li><span class="n">1</span><b>Escolha</b>Toque no lanche e em <em>Adicionar ao pedido</em>.</li>
+      <li><span class="n">2</span><b>Finalize</b>Toque na barra vermelha <em>Finalizar pedido</em>, lá embaixo da tela.</li>
+      <li><span class="n">3</span><b>Pague no Pix</b>Escaneie o QR Code ou copie o código no app do banco.</li>
+      <li><span class="n">4</span><b>Receba</b>Mostre o código do pedido pro Andoboy.</li>
+    </ol>
+  </section>
 
   <div class="parade" aria-hidden="true"><div class="track" id="track"></div><div class="track rev" id="track2"></div></div>
 
@@ -308,7 +334,7 @@ html.calm *{animation:none!important;transition:none!important}
   <div id="m-ings"></div>
   <div class="combofoot">
     <div class="qty"><button id="m-minus" aria-label="Menos">−</button><output id="m-qty">1</output><button id="m-plus" aria-label="Mais">+</button></div>
-    <button class="btn red" id="m-add">Adicionar</button>
+    <button class="btn red" id="m-add">Adicionar ao pedido</button>
   </div>
 </div>
 <aside class="drawer" id="drawer" aria-label="Carrinho" hidden>
@@ -317,7 +343,7 @@ html.calm *{animation:none!important;transition:none!important}
   <div class="lines" id="lines"></div>
   <p class="note" style="margin:8px 0 0">Pedido de um projeto escolar. Não é o McDonald's.</p>
   <div class="sum"><span>Total</span><span id="d-total">R$ 0,00</span></div>
-  <button class="btn" id="checkout">Compre aqui</button>
+  <button class="btn" id="checkout">Finalizar pedido</button>
 </aside>
 <div class="pay" id="pay" role="dialog" aria-modal="true" aria-labelledby="p-title" hidden>
   <button class="x" id="p-close" aria-label="Fechar pagamento">×</button>
@@ -355,6 +381,7 @@ html.calm *{animation:none!important;transition:none!important}
     <button class="linkbtn" id="p-new">Fazer outro pedido</button>
   </div>
 </div>
+<div class="cartbar" id="cartbar" hidden><div class="wrap"><button class="cb-view" id="cb-view"><b>Seu pedido</b><span id="cb-info"></span></button><button class="btn red cb-go" id="cb-go">Finalizar pedido</button></div></div>
 <div class="toast" id="toast" hidden role="status"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
@@ -384,7 +411,7 @@ let cat="lanches";
 function renderTabs(){$("tabs").innerHTML=cats.map(c=>`<button class="tab" id="tab-${c.id}" data-cat="${c.id}" aria-pressed="${c.id===cat}">${c.nome}</button>`).join("")}
 function renderGrid(){
   $("cat-title").textContent=cats.find(c=>c.id===cat).nome;
-  $("grid").innerHTML=items.filter(i=>i.cat===cat).map(i=>`<button class="item" id="item-${i.id}" data-id="${i.id}">${i.tag?`<span class="tag">${i.tag}</span>`:""}<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${i.icon}"/></svg><h3>${i.nome}</h3><p>${i.desc}</p><span class="price">${fmt(i.preco)}</span></button>`).join("");
+  $("grid").innerHTML=items.filter(i=>i.cat===cat).map(i=>`<button class="item" id="item-${i.id}" data-id="${i.id}">${i.tag?`<span class="tag">${i.tag}</span>`:""}<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${i.icon}"/></svg><h3>${i.nome}</h3><p>${i.desc}</p><span class="price">${fmt(i.preco)}</span><span class="addcta">Adicionar ao pedido +</span></button>`).join("");
 }
 $("tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;cat=b.dataset.cat;renderTabs();renderGrid()});
 renderTabs();renderGrid();
@@ -392,7 +419,7 @@ renderTabs();renderGrid();
 const cart=[];
 function updateCart(){
   const n=cart.reduce((a,l)=>a+l.qty,0),t=cart.reduce((a,l)=>a+l.qty*l.preco,0);
-  $("badge").textContent=n;const bb=$("open-cart");bb.classList.remove("pop");void bb.offsetWidth;bb.classList.add("pop");$("d-total").textContent=fmt(t);
+  $("badge").textContent=n;const bb=$("open-cart");bb.classList.remove("pop");void bb.offsetWidth;bb.classList.add("pop");$("d-total").textContent=fmt(t);$("cb-info").textContent=n+(n===1?" item":" itens")+" · "+fmt(t);$("cartbar").hidden=!n;document.body.classList.toggle("hasbar",!!n);
   $("lines").innerHTML=cart.length?cart.map((l,i)=>`<div class="line"><span><b>${l.qty}× ${esc(l.nome)}</b></span><button class="rm" data-i="${i}" aria-label="Remover ${esc(l.nome)}">Remover</button><small>${esc(l.extra)||"Do jeito da casa"} · ${fmt(l.qty*l.preco)}</small></div>`).join(""):`<p class="empty">Seu carrinho está vazio.<br>Escolha um lanche no cardápio.</p>`;
 }
 $("lines").addEventListener("click",e=>{const b=e.target.closest(".rm");if(!b)return;cart.splice(+b.dataset.i,1);updateCart()});
@@ -429,14 +456,15 @@ function openItem(it){
   cur=it;qty=1;$("m-qty").textContent=1;
   buildArt(it.icon);$("m-name").textContent=it.nome;$("m-desc").textContent=it.desc+" "+fmt(it.preco);
   $("m-ings").innerHTML=it.ings.length?`<b style="font-size:14px">Ingredientes (desmarque pra tirar)</b>`+it.ings.map((g,i)=>`<label class="chk"><input type="checkbox" id="ing-${i}" checked data-ing="${esc(g)}">${esc(g)}</label>`).join(""):"";
-  $("shade").hidden=false;$("modal").hidden=false;$("m-add").focus();
+  $("shade").hidden=false;$("modal").hidden=false;updAdd();$("m-add").focus();
 }
-$("m-minus").onclick=()=>{qty=Math.max(1,qty-1);$("m-qty").textContent=qty};
-$("m-plus").onclick=()=>{qty=Math.min(20,qty+1);$("m-qty").textContent=qty};
+function updAdd(){$("m-add").textContent="Adicionar ao pedido · "+fmt(cur.preco*qty)}
+$("m-minus").onclick=()=>{qty=Math.max(1,qty-1);$("m-qty").textContent=qty;updAdd()};
+$("m-plus").onclick=()=>{qty=Math.min(20,qty+1);$("m-qty").textContent=qty;updAdd()};
 $("m-add").onclick=()=>{
   const sem=[...document.querySelectorAll("#m-ings input:not(:checked)")].map(x=>x.dataset.ing);
   cart.push({id:cur.id,nome:cur.nome,preco:cur.preco,qty,extra:sem.length?"Sem "+sem.join(", ").toLowerCase():""});
-  fly($("m-art"),cur.icon);updateCart();closeAll();toast(cur.nome+" foi pro carrinho");
+  fly($("m-art"),cur.icon);updateCart();closeAll();toast(cur.nome+" adicionado! Toque em Finalizar pedido lá embaixo.");
 };
 
 const steps=[["lanches","1. Lanche"],["acomp","2. Acompanhamento"],["bebidas","3. Bebida"]];
@@ -444,7 +472,7 @@ $("steps").innerHTML=steps.map(([c,t])=>`<div class="step"><h4>${t}</h4>${items.
 function comboSel(){return steps.map(([c])=>byId(document.querySelector(`input[name="c-${c}"]:checked`).value))}
 function renderCombo(){const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);$("combo-old").textContent=fmt(full);$("combo-price").textContent=fmt(full-3)}
 $("steps").addEventListener("change",renderCombo);renderCombo();
-$("add-combo").onclick=()=>{const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);cart.push({tipo:"combo",ids:s.map(i=>i.id),nome:"Combo "+s[0].nome,preco:full-3,qty:1,extra:s[1].nome+" + "+s[2].nome});fly($("add-combo"),s[0].icon);fly($("add-combo"),s[1].icon,120);fly($("add-combo"),s[2].icon,240);updateCart();toast("Combo adicionado!")};
+$("add-combo").onclick=()=>{const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);cart.push({tipo:"combo",ids:s.map(i=>i.id),nome:"Combo "+s[0].nome,preco:full-3,qty:1,extra:s[1].nome+" + "+s[2].nome});fly($("add-combo"),s[0].icon);fly($("add-combo"),s[1].icon,120);fly($("add-combo"),s[2].icon,240);updateCart();toast("Combo adicionado! Toque em Finalizar pedido lá embaixo.")};
 $("hero-combo").onclick=()=>$("combo").scrollIntoView({behavior:"smooth"});
 $("hero-menu").onclick=()=>$("cardapio").scrollIntoView({behavior:"smooth"});
 
@@ -463,6 +491,8 @@ function pixPayload(valor,txid){
 const total=()=>cart.reduce((a,l)=>a+l.qty*l.preco,0);
 let pedido=null;
 function payStep(n){["p-step1","p-step2","p-step3"].forEach((id,i)=>$(id).hidden=i!==n-1)}
+$("cb-view").onclick=()=>{$("shade").hidden=false;$("drawer").hidden=false};
+$("cb-go").onclick=()=>openPay();
 function openPay(){
   if(!cart.length){toast("Adicione algum lanche primeiro.");return}
   $("drawer").hidden=true;$("shade").hidden=false;$("pay").hidden=false;
