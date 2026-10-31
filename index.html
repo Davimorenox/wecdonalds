@@ -172,6 +172,9 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(36px,5vw,52px);lin
 .stepsline span.on{background:var(--red);color:var(--cream)}
 .warn{background:#FFF0A0;border-radius:14px;padding:10px 12px;font-size:14px;text-align:left}
 a.btn{display:inline-block;text-decoration:none;text-align:center}
+.saved{background:#E3F6EA;color:#14532D;border-radius:14px;padding:10px 12px;font-weight:700;font-size:15px}
+.saved b{font-family:var(--display);font-weight:400;font-size:22px}
+.drawer .linkbtn{align-self:center}
 .linkbtn{background:none;border:0;color:var(--muted);font-weight:700;text-decoration:underline;cursor:pointer}
 .andoboy{margin-top:60px;display:grid;grid-template-columns:.8fr 1.2fr;gap:28px;align-items:center;background:var(--cream);border-radius:30px;padding:26px;box-shadow:0 10px 0 var(--red-dk)}
 .andoboy h2 span{color:var(--ink);display:inline-block;background:var(--yellow);padding:0 10px;border-radius:10px;transform:rotate(-2deg);text-shadow:none}
@@ -344,6 +347,7 @@ html.calm *{animation:none!important;transition:none!important}
   <p class="note" style="margin:8px 0 0">Pedido de um projeto escolar. Não é o McDonald's.</p>
   <div class="sum"><span>Total</span><span id="d-total">R$ 0,00</span></div>
   <button class="btn" id="checkout">Finalizar pedido</button>
+  <button class="linkbtn" id="d-more" style="margin-top:10px">Continuar escolhendo</button>
 </aside>
 <div class="pay" id="pay" role="dialog" aria-modal="true" aria-labelledby="p-title" hidden>
   <button class="x" id="p-close" aria-label="Fechar pagamento">×</button>
@@ -360,6 +364,7 @@ html.calm *{animation:none!important;transition:none!important}
   <div id="p-step2" hidden style="display:grid;gap:14px">
     <div class="stepsline"><span>1. Seus dados</span><span class="on">2. Pix</span><span>3. Pronto</span></div>
     <h3>Pague com Pix</h3>
+    <div class="saved">Pedido <b id="p-code2"></b> já foi registrado! Agora é só pagar.</div>
     <div>Total <span class="big-total" id="p-total2"></span></div>
     <div class="warn" id="p-nokey" hidden><b>Pix ainda não configurado.</b> Falta colocar a chave Pix de quem vai receber. Por enquanto, este é só o visual de teste.</div>
     <div class="qrbox" id="p-qr"></div>
@@ -464,7 +469,7 @@ $("m-plus").onclick=()=>{qty=Math.min(20,qty+1);$("m-qty").textContent=qty;updAd
 $("m-add").onclick=()=>{
   const sem=[...document.querySelectorAll("#m-ings input:not(:checked)")].map(x=>x.dataset.ing);
   cart.push({id:cur.id,nome:cur.nome,preco:cur.preco,qty,extra:sem.length?"Sem "+sem.join(", ").toLowerCase():""});
-  fly($("m-art"),cur.icon);updateCart();closeAll();toast(cur.nome+" adicionado! Toque em Finalizar pedido lá embaixo.");
+  fly($("m-art"),cur.icon);updateCart();closeAll();setTimeout(()=>{openCart();toast(cur.nome+" adicionado!")},cur&&!calm?650:0);
 };
 
 const steps=[["lanches","1. Lanche"],["acomp","2. Acompanhamento"],["bebidas","3. Bebida"]];
@@ -472,7 +477,7 @@ $("steps").innerHTML=steps.map(([c,t])=>`<div class="step"><h4>${t}</h4>${items.
 function comboSel(){return steps.map(([c])=>byId(document.querySelector(`input[name="c-${c}"]:checked`).value))}
 function renderCombo(){const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);$("combo-old").textContent=fmt(full);$("combo-price").textContent=fmt(full-3)}
 $("steps").addEventListener("change",renderCombo);renderCombo();
-$("add-combo").onclick=()=>{const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);cart.push({tipo:"combo",ids:s.map(i=>i.id),nome:"Combo "+s[0].nome,preco:full-3,qty:1,extra:s[1].nome+" + "+s[2].nome});fly($("add-combo"),s[0].icon);fly($("add-combo"),s[1].icon,120);fly($("add-combo"),s[2].icon,240);updateCart();toast("Combo adicionado! Toque em Finalizar pedido lá embaixo.")};
+$("add-combo").onclick=()=>{const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);cart.push({tipo:"combo",ids:s.map(i=>i.id),nome:"Combo "+s[0].nome,preco:full-3,qty:1,extra:s[1].nome+" + "+s[2].nome});fly($("add-combo"),s[0].icon);fly($("add-combo"),s[1].icon,120);fly($("add-combo"),s[2].icon,240);updateCart();setTimeout(()=>{openCart();toast("Combo adicionado!")},calm?0:650)};
 $("hero-combo").onclick=()=>$("combo").scrollIntoView({behavior:"smooth"});
 $("hero-menu").onclick=()=>$("cardapio").scrollIntoView({behavior:"smooth"});
 
@@ -491,7 +496,9 @@ function pixPayload(valor,txid){
 const total=()=>cart.reduce((a,l)=>a+l.qty*l.preco,0);
 let pedido=null;
 function payStep(n){["p-step1","p-step2","p-step3"].forEach((id,i)=>$(id).hidden=i!==n-1)}
-$("cb-view").onclick=()=>{$("shade").hidden=false;$("drawer").hidden=false};
+function openCart(){$("shade").hidden=false;$("drawer").hidden=false;$("checkout").focus()}
+$("cb-view").onclick=openCart;
+$("d-more").onclick=closeAll;
 $("cb-go").onclick=()=>openPay();
 function openPay(){
   if(!cart.length){toast("Adicione algum lanche primeiro.");return}
@@ -521,6 +528,7 @@ $("p-gen").onclick=async()=>{
   if(window.qrcode){const q=qrcode(0,"M");q.addData(code);q.make();$("p-qr").innerHTML=q.createSvgTag({cellSize:5,margin:2,scalable:true});$("p-qr").hidden=false}
   else $("p-qr").hidden=true;
   $("p-nokey").hidden=true;$("p-copybox").hidden=false;$("p-done").hidden=false;
+  $("p-code2").textContent=r.codigo;
   payStep(2);
 };
 $("p-copy").onclick=()=>{
