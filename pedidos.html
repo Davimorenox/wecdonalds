@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="logo.svg">
+<title>Pedidos Wec Donalds</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Painel da cozinha: barra vermelha com resumo do dia, filtros, cartões de pedido com status em faixa colorida */
+:root{
+  --red:#F2131B; --red-dk:#B80D13; --red-deep:#5E0508; --yellow:#FFD60A; --yellow-lt:#FFF0A0; --cream:#FFFDF2; --ink:#2B0A06; --muted:#7A2E1E;
+  --wait:#FF9F1C; --paid:#1E9E5A; --done:#2B6CB0; --cancel:#8A8A8A;
+  --display:"Lilita One","Arial Black",sans-serif; --body:"Baloo 2","Trebuchet MS",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--yellow);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:var(--red);color:var(--cream);padding-top:env(safe-area-inset-top,0px)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:16px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:24px;color:var(--yellow);text-shadow:2px 2px 0 var(--red-deep)}
+.brand img{width:42px;height:42px;border-radius:50%}
+.small{font-size:14px;opacity:.9}
+button{font-family:var(--body);cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px dashed var(--red-deep);outline-offset:2px}
+.btn{font-weight:800;font-size:16px;border:0;border-radius:12px;padding:10px 18px;background:var(--yellow);color:var(--ink);box-shadow:0 4px 0 var(--red-deep)}
+.btn.red{background:var(--red);color:var(--cream)}
+.ghost{background:transparent;color:var(--cream);border:2px solid var(--cream);border-radius:999px;padding:6px 14px;font-weight:800}
+.login{max-width:380px;margin:60px auto;background:var(--cream);border-radius:24px;padding:24px;display:grid;gap:12px;box-shadow:0 8px 0 var(--red-dk)}
+.login h1{margin:0;font-family:var(--display);font-weight:400;color:var(--red);font-size:30px}
+input{font:600 17px var(--body);padding:12px 14px;border-radius:12px;border:2px solid #F3D9A0;background:#fff;color:var(--ink)}
+.err{color:var(--red);font-weight:700;min-height:1.2em}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-block:18px}
+.stat{background:var(--cream);border-radius:16px;padding:12px;box-shadow:0 4px 0 var(--red-dk)}
+.stat b{display:block;font-family:var(--display);font-weight:400;font-size:28px;color:var(--red);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted);font-weight:700}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.filters button{white-space:nowrap;border:0;border-radius:999px;padding:7px 16px;font-weight:800;background:var(--cream);color:var(--ink);box-shadow:0 3px 0 var(--red-dk)}
+.filters button[aria-pressed="true"]{background:var(--red);color:var(--cream)}
+.list{display:grid;gap:14px;margin-block:16px 60px}
+.card{background:var(--cream);border-radius:18px;padding:14px 16px;display:grid;gap:8px;border-left:10px solid var(--wait);box-shadow:0 4px 0 rgba(94,5,8,.25)}
+.card[data-s="Pago"]{border-left-color:var(--paid)}
+.card[data-s="Entregue"]{border-left-color:var(--done);opacity:.75}
+.card[data-s="Cancelado"]{border-left-color:var(--cancel);opacity:.55}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.code{font-family:var(--display);font-size:26px;color:var(--red)}
+.total{font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums}
+.who{font-weight:800;font-size:18px}
+.where{display:inline-block;background:var(--yellow);border-radius:8px;padding:0 8px;font-weight:800}
+.items{white-space:pre-line;background:#FFF7CC;border-radius:12px;padding:8px 12px;font-weight:600}
+.meta{font-size:14px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+.pill{font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px;color:#fff;background:var(--wait)}
+.card[data-s="Pago"] .pill{background:var(--paid)}.card[data-s="Entregue"] .pill{background:var(--done)}.card[data-s="Cancelado"] .pill{background:var(--cancel)}
+.claim{color:var(--paid);font-weight:800}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts button{border:0;border-radius:10px;padding:8px 14px;font-weight:800;color:#fff}
+.a-pago{background:var(--paid)}.a-entregue{background:var(--done)}.a-cancelar{background:var(--cancel)}.a-voltar{background:var(--wait)}
+.acts button:disabled{opacity:.5}
+.empty{text-align:center;color:var(--muted);padding:40px 0;font-weight:700}
+.hint{font-size:14px;color:var(--muted);margin:0}
+@media (max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><img src="logo.svg" alt="">Pedidos</div>
+  <div id="bar" hidden><span class="small" id="updated"></span> <button class="ghost" id="refresh">Atualizar</button> <button class="ghost" id="logout">Sair</button></div>
+</div></header>
+
+<form class="login" id="login">
+  <h1>Área da cozinha</h1>
+  <p class="hint">Só pra equipe Wec Donalds. Digite a senha pra ver os pedidos.</p>
+  <input id="senha" type="password" autocomplete="current-password" placeholder="Senha" aria-label="Senha">
+  <div class="err" id="err"></div>
+  <button class="btn red" type="submit">Entrar</button>
+</form>
+
+<main class="wrap" id="painel" hidden>
+  <div class="stats">
+    <div class="stat"><b id="s-wait">0</b><span>Aguardando Pix</span></div>
+    <div class="stat"><b id="s-paid">0</b><span>Pagos pra entregar</span></div>
+    <div class="stat"><b id="s-done">0</b><span>Entregues hoje</span></div>
+    <div class="stat"><b id="s-money">R$ 0</b><span>Vendido hoje</span></div>
+  </div>
+  <p class="hint">Confira no app do banco: nome de quem pagou, valor e horário. Se bater com o pedido, marque como pago.</p>
+  <div class="filters" id="filters"></div>
+  <div class="list" id="list"></div>
+</main>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbw7FLs9RIgxs1yWNpVnKp4XOIl8V3HL2sRlygN4L8d3Uplq986VrOeeDHVel0jq_vpS2Q/exec";
+const $=id=>document.getElementById(id);
+const fmt=v=>Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let senha="",pedidos=[],hoje="",filtro="Ativos",timer;
+try{senha=sessionStorage.getItem("wec-senha")||""}catch(e){}
+
+const filtros=["Ativos","Aguardando Pix","Pago","Entregue","Cancelado","Todos"];
+function renderFiltros(){$("filters").innerHTML=filtros.map(f=>`<button data-f="${f}" aria-pressed="${f===filtro}">${f}</button>`).join("")}
+$("filters").onclick=e=>{const b=e.target.closest("button");if(!b)return;filtro=b.dataset.f;renderFiltros();render()};
+
+async function carregar(){
+  try{
+    const r=await (await fetch(API+"?acao=lista&senha="+encodeURIComponent(senha))).json();
+    if(!r.ok){if(r.erro==="senha"){sair("Senha errada.")}return}
+    pedidos=r.pedidos;hoje=r.hoje;
+    $("updated").textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    render();
+  }catch(e){$("updated").textContent="Sem conexão, tentando de novo..."}
+}
+function render(){
+  const doDia=pedidos.filter(p=>p.dia===hoje);
+  $("s-wait").textContent=pedidos.filter(p=>p.status==="Aguardando Pix").length;
+  $("s-paid").textContent=pedidos.filter(p=>p.status==="Pago").length;
+  $("s-done").textContent=doDia.filter(p=>p.status==="Entregue").length;
+  $("s-money").textContent=fmt(doDia.filter(p=>p.status==="Pago"||p.status==="Entregue").reduce((a,p)=>a+p.total,0));
+  const lista=pedidos.filter(p=>filtro==="Todos"?true:filtro==="Ativos"?(p.status==="Aguardando Pix"||p.status==="Pago"):p.status===filtro);
+  $("list").innerHTML=lista.length?lista.map(p=>`<article class="card" data-s="${esc(p.status)}">
+    <div class="top"><span class="code">${esc(p.codigo)}</span><span class="pill">${esc(p.status)}</span><span class="total">${fmt(p.total)}</span></div>
+    <div><span class="who">${esc(p.nome)}</span> · Turma ${esc(p.turma)} · <span class="where">${esc(p.local)}</span></div>
+    <div class="items">${esc(p.itens)}</div>
+    <div class="meta"><span>Pedido às ${esc(p.data)}</span>${p.pagou?`<span class="claim">Cliente disse que pagou (${esc(p.pagou).replace(/^Sim, /,"")})</span>`:"<span>Cliente ainda não confirmou o Pix</span>"}</div>
+    <div class="acts">${acoes(p)}</div>
+  </article>`).join(""):`<p class="empty">Nenhum pedido aqui ainda.</p>`;
+}
+function acoes(p){
+  const b=(cls,st,txt)=>`<button class="${cls}" data-c="${esc(p.codigo)}" data-s="${st}">${txt}</button>`;
+  if(p.status==="Aguardando Pix")return b("a-pago","Pago","Pix conferido")+b("a-cancelar","Cancelado","Cancelar");
+  if(p.status==="Pago")return b("a-entregue","Entregue","Andoboy entregou")+b("a-voltar","Aguardando Pix","Voltar");
+  return b("a-voltar","Aguardando Pix","Reabrir");
+}
+$("list").onclick=async e=>{
+  const bt=e.target.closest("button[data-c]");if(!bt)return;
+  bt.disabled=true;
+  try{
+    const r=await (await fetch(API+"?acao=status&senha="+encodeURIComponent(senha)+"&codigo="+encodeURIComponent(bt.dataset.c)+"&status="+encodeURIComponent(bt.dataset.s))).json();
+    if(r.ok){const p=pedidos.find(x=>x.codigo===bt.dataset.c);if(p)p.status=bt.dataset.s;render()}else bt.disabled=false;
+  }catch(err){bt.disabled=false}
+};
+function entrar(){$("login").hidden=true;$("painel").hidden=false;$("bar").hidden=false;renderFiltros();carregar();clearInterval(timer);timer=setInterval(carregar,20000)}
+function sair(msg){senha="";try{sessionStorage.removeItem("wec-senha")}catch(e){}clearInterval(timer);$("painel").hidden=true;$("bar").hidden=true;$("login").hidden=false;$("err").textContent=msg||""}
+$("login").onsubmit=async e=>{
+  e.preventDefault();senha=$("senha").value.trim();if(!senha){$("err").textContent="Digite a senha.";return}
+  $("err").textContent="Conferindo...";
+  try{
+    const r=await (await fetch(API+"?acao=lista&senha="+encodeURIComponent(senha))).json();
+    if(!r.ok){$("err").textContent="Senha errada.";return}
+    try{sessionStorage.setItem("wec-senha",senha)}catch(e){}
+    $("err").textContent="";entrar();
+  }catch(err){$("err").textContent="Sem conexão com a planilha. Tente de novo."}
+};
+$("senha").oninput=()=>$("err").textContent="";
+$("refresh").onclick=carregar;$("logout").onclick=()=>sair();
+if(senha)entrar();
+</script>
+</body>
+</html>
