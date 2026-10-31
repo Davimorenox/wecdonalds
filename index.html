@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Wec Donalds: lanchonete fictícia de um projeto escolar. Peça seu lanche e pague no Pix.">
+<meta property="og:title" content="Wec Donalds">
+<meta property="og:description" content="Projeto escolar. Peça seu lanche, pague no Pix e o Andoboy entrega.">
+<link rel="icon" href="logo.svg">
+<style>html{-webkit-text-size-adjust:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Wec Donalds</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Layout: palco vermelho com raios girando e lanches flutuando, onda pro cardápio amarelo pontilhado, faixa dupla infinita, combo em bloco vermelho. Visual único vermelho e amarelo, igual nos dois temas. */
+:root{
+  --red:#F2131B; --red-dk:#B80D13; --red-deep:#5E0508; --yellow:#FFD60A; --yellow-lt:#FFF0A0; --cream:#FFFDF2; --ink:#2B0A06; --muted:#7A2E1E;
+  --display:"Lilita One","Arial Black",sans-serif; --body:"Baloo 2","Trebuchet MS",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--yellow);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--red-deep)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font-family:var(--body)}
+button:focus-visible,label:focus-within{outline:3px dashed var(--red-deep);outline-offset:3px}
+
+.aviso{background:var(--red-deep);color:var(--yellow-lt);font-size:14px;text-align:center}
+.aviso .wrap{padding-block:7px}
+
+.stagebg{background:var(--red);position:relative;overflow:hidden;color:var(--cream)}
+.rays{position:absolute;left:50%;top:50%;width:2200px;height:2200px;margin:-1100px 0 0 -1100px;background:repeating-conic-gradient(from 0deg,rgba(255,214,10,.16) 0 9deg,transparent 9deg 18deg);animation:spin 60s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spark{position:absolute;width:10px;height:10px;background:var(--yellow);border-radius:2px;opacity:.8;animation:twinkle 3s ease-in-out infinite;pointer-events:none}
+@keyframes twinkle{50%{transform:scale(.3) rotate(45deg);opacity:.2}}
+
+header.top{position:relative;z-index:3;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:16px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:28px;color:var(--yellow);text-shadow:3px 3px 0 var(--red-deep)}
+.brand svg{width:46px;height:46px;filter:drop-shadow(3px 3px 0 var(--red-deep))}
+.actions{display:flex;gap:8px;align-items:center}
+.motion{font-weight:800;font-size:13px;background:transparent;color:var(--cream);border:2px solid var(--cream);border-radius:999px;padding:6px 12px;cursor:pointer}
+.cartbtn{font-weight:800;font-size:16px;background:var(--yellow);color:var(--ink);border:0;border-radius:999px;padding:8px 16px;cursor:pointer;display:flex;gap:8px;align-items:center;box-shadow:0 4px 0 var(--red-deep)}
+.cartbtn b{background:var(--red);color:var(--cream);border-radius:999px;min-width:26px;padding:0 6px;font-variant-numeric:tabular-nums;text-align:center}
+.cartbtn.pop{animation:pop .45s ease-out}
+@keyframes pop{40%{transform:scale(1.2) rotate(-6deg)}}
+
+.hero{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:center;padding-block:10px 70px}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(52px,9vw,104px);line-height:.92;margin:0;color:var(--yellow);text-shadow:5px 5px 0 var(--red-deep);text-wrap:balance}
+.hero h1 span{color:var(--cream);display:inline-block;animation:wiggle 2.4s ease-in-out infinite}
+@keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) scale(1.04)}}
+.hero p{font-size:20px;font-weight:500;max-width:40ch;margin:18px 0 24px;color:var(--yellow-lt)}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{position:relative;overflow:hidden;font-weight:800;font-size:19px;border:0;background:var(--yellow);color:var(--ink);padding:14px 28px;border-radius:16px;cursor:pointer;box-shadow:0 6px 0 var(--red-deep);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--red-deep)}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--red-deep)}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.6) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.5s ease-in-out infinite}
+@keyframes shine{60%,100%{transform:translateX(120%)}}
+.btn.ghost{background:transparent;color:var(--cream);box-shadow:inset 0 0 0 3px var(--cream)}
+.btn.ghost::after{display:none}
+.btn.red{background:var(--red);color:var(--cream);box-shadow:0 6px 0 var(--red-deep)}
+
+.stage{position:relative;justify-self:center;width:100%;max-width:420px;aspect-ratio:1;display:grid;place-items:center}
+.logoW{width:72%;position:relative;z-index:1;filter:drop-shadow(8px 8px 0 var(--red-deep));animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.05) rotate(-3deg)}}
+.ring{position:absolute;inset:6%;border:4px dashed rgba(255,214,10,.6);border-radius:50%;animation:spin 30s linear infinite reverse}
+.fl{position:absolute;width:26%;z-index:2;filter:drop-shadow(0 10px 8px rgba(60,0,0,.35));animation:bob 4s ease-in-out infinite}
+.f1{left:-2%;top:4%}.f2{right:-2%;top:0;animation-delay:-1s}.f3{left:2%;bottom:2%;animation-delay:-2s}.f4{right:0;bottom:4%;animation-delay:-3s}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-20px) rotate(8deg)}}
+.wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:60px;z-index:2;display:block}
+
+.feats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;position:relative;z-index:3;margin-top:-34px}
+.feats li{background:var(--cream);border-radius:18px;padding:14px 18px;display:grid;font-size:15px;color:var(--muted);box-shadow:0 5px 0 var(--red-dk);transform:rotate(-1deg)}
+.feats li:nth-child(2){transform:rotate(1deg)}
+.feats b{font-family:var(--display);font-weight:400;color:var(--red);font-size:22px}
+
+.parade{background:var(--red-deep);overflow:hidden;padding-block:12px;margin-top:40px;transform:rotate(-2deg) scale(1.04)}
+.track{display:flex;gap:46px;width:max-content;animation:roll 28s linear infinite}
+.track.rev{animation-direction:reverse;animation-duration:36s;margin-top:10px}
+.track svg{width:58px;height:58px;flex:none}
+.track svg:nth-child(odd){animation:hop 1.2s ease-in-out infinite}
+@keyframes roll{to{transform:translateX(-50%)}}
+@keyframes hop{50%{transform:translateY(-8px) rotate(6deg)}}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--yellow);margin-top:30px;box-shadow:0 4px 0 rgba(94,5,8,.15)}
+.tabs .wrap{display:flex;gap:10px;overflow-x:auto;padding-block:12px;scrollbar-width:none}
+.tab{font-weight:800;font-size:16px;white-space:nowrap;background:var(--cream);color:var(--ink);border:0;border-radius:999px;padding:8px 20px;cursor:pointer;box-shadow:0 3px 0 var(--red-dk);transition:transform .15s}
+.tab:hover{transform:translateY(-2px)}
+.tab[aria-pressed="true"]{background:var(--red);color:var(--cream);box-shadow:0 3px 0 var(--red-deep)}
+
+.dots{background-image:radial-gradient(rgba(242,19,27,.14) 2.2px,transparent 2.8px);background-size:22px 22px}
+main{padding-block:30px 60px}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(36px,5vw,52px);line-height:1;margin:0 0 6px;color:var(--red);text-shadow:3px 3px 0 var(--cream)}
+.note{color:var(--muted);margin:0 0 22px;font-size:15px;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px}
+.item{position:relative;background:var(--cream);border:0;border-radius:24px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left;font:inherit;color:inherit;box-shadow:0 8px 0 var(--red-dk);transition:transform .2s,box-shadow .2s;animation:rise .5s ease-out both}
+.item:nth-child(2){animation-delay:.07s}.item:nth-child(3){animation-delay:.14s}.item:nth-child(4){animation-delay:.21s}
+@keyframes rise{from{transform:translateY(24px) scale(.96)}}
+.item:hover{transform:translateY(-6px) rotate(-1.5deg);box-shadow:0 14px 0 var(--red-dk)}
+.item svg{width:100%;height:150px;background:radial-gradient(circle at 50% 60%,var(--yellow-lt),var(--yellow) 70%);border-radius:18px;padding:12px;overflow:visible}
+.item svg use{animation:bob 3.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.item:nth-child(2n) svg use{animation-delay:-1.2s}.item:nth-child(3n) svg use{animation-delay:-2.4s}
+.item:hover svg use{animation-duration:1s}
+.item h3{margin:8px 0 0;font-family:var(--display);font-weight:400;font-size:24px;color:var(--ink)}
+.item p{margin:0;color:var(--muted);font-size:15px;flex:1}
+.price{font-weight:800;font-variant-numeric:tabular-nums}
+.item .price{position:absolute;right:12px;top:-12px;background:var(--red);color:var(--cream);font-size:17px;padding:6px 12px;border-radius:999px;transform:rotate(6deg);box-shadow:0 3px 0 var(--red-deep)}
+.tag{position:absolute;left:12px;top:-12px;z-index:1;background:var(--ink);color:var(--yellow);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:8px;transform:rotate(-5deg)}
+
+.combo{margin-top:56px;background:var(--red);color:var(--cream);border-radius:30px;padding:26px;display:grid;gap:18px;position:relative;overflow:hidden;box-shadow:0 10px 0 var(--red-deep)}
+.combo .rays{width:1400px;height:1400px;margin:-700px 0 0 -700px;opacity:.6}
+.combo>*{position:relative}
+.combo h2{color:var(--yellow);text-shadow:3px 3px 0 var(--red-deep)}
+.combo .note{color:var(--yellow-lt)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{background:var(--cream);color:var(--ink);border-radius:20px;padding:14px}
+.step h4{margin:0 0 8px;font-family:var(--display);font-weight:400;font-size:20px;color:var(--red)}
+.opt{display:flex;align-items:center;gap:8px;border-radius:12px;padding:8px 10px;margin-bottom:6px;cursor:pointer;background:#FFF7CC;font-weight:700}
+.opt:has(input:checked){background:var(--yellow);box-shadow:inset 0 0 0 2px var(--red)}
+.opt input{accent-color:var(--red)}
+.opt span{flex:1;min-width:0}
+.combofoot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.combo .combofoot{font-size:20px;font-weight:700}
+.combo .combofoot s{opacity:.7}
+.combo .combofoot .price{font-family:var(--display);font-weight:400;font-size:34px;color:var(--yellow)}
+
+.rodape{background:var(--red-deep);color:var(--yellow-lt);font-size:15px;text-align:center}
+.rodape .wrap{padding-block:28px}
+.rodape b{font-family:var(--display);font-weight:400;font-size:26px;color:var(--yellow);display:block}
+
+.shade{position:fixed;inset:0;background:rgba(43,10,6,.6);z-index:20;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal{position:fixed;z-index:21;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 40px);overflow:auto;background:var(--cream);border-radius:28px;padding:22px;display:grid;gap:12px;box-shadow:0 10px 0 var(--red-dk)}
+.modal svg.big{width:170px;height:170px;justify-self:center;overflow:visible;background:radial-gradient(circle,var(--yellow) 0 60%,transparent 61%);border-radius:50%;padding:10px}
+.modal h3{margin:0;font-family:var(--display);font-weight:400;font-size:32px;color:var(--red)}
+.drop{animation:drop .5s cubic-bezier(.3,1.5,.6,1) both}
+@keyframes drop{from{transform:translateY(-80px);opacity:0}}
+.flyer{position:fixed;width:80px;height:80px;z-index:40;pointer-events:none;filter:drop-shadow(0 8px 10px rgba(60,0,0,.35))}
+.chk{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:2px dotted #F3D9A0;font-weight:700}
+.chk input{accent-color:var(--red);width:18px;height:18px}
+.qty{display:flex;align-items:center;gap:12px}
+.qty button{font-weight:800;font-size:22px;width:42px;height:42px;border-radius:50%;border:0;background:var(--yellow);color:var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--red-dk)}
+.qty output{font-weight:800;font-size:22px;min-width:24px;text-align:center}
+.x{position:absolute;right:14px;top:12px;font-weight:800;font-size:24px;background:none;border:0;color:var(--ink);cursor:pointer;z-index:1}
+.drawer{position:fixed;z-index:21;top:0;right:0;bottom:0;width:min(400px,100vw);background:var(--cream);display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) 18px;animation:slide .3s cubic-bezier(.3,1.3,.6,1);box-shadow:-8px 0 0 var(--red)}
+@keyframes slide{from{transform:translateX(100%)}}
+.drawer h3{margin:0 0 10px;font-family:var(--display);font-weight:400;font-size:32px;color:var(--red)}
+.lines{flex:1;overflow:auto;display:grid;align-content:start;gap:10px}
+.line{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:#FFF7CC;border-radius:14px;padding:10px 12px}
+.line small{color:var(--muted);grid-column:1}
+.line .rm{grid-column:2;grid-row:1/3;align-self:center;background:none;border:0;color:var(--red);font-weight:800;cursor:pointer}
+.empty{color:var(--muted);text-align:center;padding:30px 0}
+.sum{display:flex;justify-content:space-between;font-family:var(--display);font-size:26px;padding-block:12px;font-variant-numeric:tabular-nums}
+.drawer .btn{background:var(--red);color:var(--cream)}
+.toast{position:fixed;left:50%;top:calc(20px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--yellow);padding:12px 22px;border-radius:16px;font-weight:800;z-index:50;max-width:90vw;text-align:center;animation:toastin .4s cubic-bezier(.3,1.5,.6,1)}
+@keyframes toastin{from{transform:translate(-50%,-40px);opacity:0}}
+
+@media (max-width:760px){.hero{grid-template-columns:1fr;padding-bottom:60px}.stage{max-width:320px;order:-1}.feats{grid-template-columns:1fr;margin-top:-24px}.steps{grid-template-columns:1fr}.motion{font-size:12px}}
+.pay{position:fixed;z-index:22;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 40px);overflow:auto;background:var(--cream);border-radius:28px;padding:24px;display:grid;gap:14px;box-shadow:0 10px 0 var(--red-dk);text-align:center}
+.pay h3{margin:0;font-family:var(--display);font-weight:400;font-size:30px;color:var(--red)}
+.pay .big-total{font-family:var(--display);font-size:40px;color:var(--ink)}
+.field{display:grid;gap:4px;text-align:left;font-weight:700}
+.field input{font:600 17px var(--body);padding:12px 14px;border-radius:12px;border:2px solid #F3D9A0;background:#FFFDF8;color:var(--ink)}
+.field input:focus{outline:none;border-color:var(--red)}
+.err{color:var(--red);font-size:14px;font-weight:700;min-height:1em;text-align:left}
+.qrbox{justify-self:center;background:#fff;padding:12px;border-radius:18px;box-shadow:0 0 0 4px var(--yellow)}
+.qrbox svg{display:block;width:220px;height:220px}
+.copy{display:grid;gap:8px;text-align:left}
+.copy textarea{font:500 12px ui-monospace,Menlo,monospace;resize:none;height:76px;padding:10px;border-radius:12px;border:2px dashed #F3D9A0;background:#FFFDF8;color:var(--ink);word-break:break-all}
+.code{display:inline-block;font-family:var(--display);font-size:30px;letter-spacing:.06em;background:var(--yellow);padding:4px 16px;border-radius:12px;transform:rotate(-2deg)}
+.stepsline{display:flex;justify-content:center;gap:6px;font-size:13px;font-weight:800;color:var(--muted)}
+.stepsline span{padding:2px 10px;border-radius:999px;background:#FFF7CC}
+.stepsline span.on{background:var(--red);color:var(--cream)}
+.warn{background:#FFF0A0;border-radius:14px;padding:10px 12px;font-size:14px;text-align:left}
+a.btn{display:inline-block;text-decoration:none;text-align:center}
+.linkbtn{background:none;border:0;color:var(--muted);font-weight:700;text-decoration:underline;cursor:pointer}
+.andoboy{margin-top:60px;display:grid;grid-template-columns:.8fr 1.2fr;gap:28px;align-items:center;background:var(--cream);border-radius:30px;padding:26px;box-shadow:0 10px 0 var(--red-dk)}
+.andoboy h2 span{color:var(--ink);display:inline-block;background:var(--yellow);padding:0 10px;border-radius:10px;transform:rotate(-2deg);text-shadow:none}
+.andoboy p{font-size:18px;margin:10px 0 14px}
+.eyebrow{font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ando-list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.ando-list li{background:var(--yellow);font-weight:800;font-size:15px;padding:6px 14px;border-radius:999px}
+.ando-art{display:grid;place-items:center;background:radial-gradient(circle,var(--yellow) 0 58%,transparent 59%);border-radius:24px}
+.ando-svg{width:100%;max-width:260px;animation:strut 1s ease-in-out infinite}
+@keyframes strut{50%{transform:translateY(-6px) rotate(1.5deg)}}
+.ando-box{animation:boxbob 1s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom}
+@keyframes boxbob{50%{transform:translateY(-4px) rotate(-1.5deg)}}
+.leg{transform-box:fill-box;transform-origin:top;animation:step 1s ease-in-out infinite}
+.leg.r{animation-delay:-.5s}
+@keyframes step{25%{transform:rotate(10deg)}75%{transform:rotate(-10deg)}}
+.ando-wave{transform-box:fill-box;transform-origin:0 100%;animation:wave 1.2s ease-in-out infinite}
+@keyframes wave{50%{transform:rotate(18deg)}}
+.mini-ando{width:90px;justify-self:center}
+.field small{font-weight:500;color:var(--muted)}
+@media (max-width:760px){.andoboy{grid-template-columns:1fr}}
+html.calm *{animation:none!important;transition:none!important}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="burger"><path d="M12 46C12 18 30 10 50 10S88 18 88 46Q88 50 84 50H16Q12 50 12 46z" fill="#EE9F3E"/><path d="M22 36C24 20 38 14 52 14" fill="none" stroke="#F8C878" stroke-width="5" stroke-linecap="round"/><g fill="#FFF1D2"><ellipse cx="34" cy="26" rx="2.6" ry="1.4" transform="rotate(-20 34 26)"/><ellipse cx="48" cy="20" rx="2.6" ry="1.4"/><ellipse cx="62" cy="24" rx="2.6" ry="1.4" transform="rotate(20 62 24)"/><ellipse cx="42" cy="33" rx="2.6" ry="1.4" transform="rotate(10 42 33)"/><ellipse cx="57" cy="32" rx="2.6" ry="1.4" transform="rotate(-10 57 32)"/><ellipse cx="70" cy="34" rx="2.6" ry="1.4" transform="rotate(25 70 34)"/></g><path d="M10 52q5-5 10 0t10 0t10 0t10 0t10 0t10 0t10 0t10 0L88 58H12z" fill="#6DBE3E"/><rect x="14" y="56" width="72" height="5" rx="2" fill="#E5432F"/><path d="M11 60H89L84 66L76 62L68 69L60 62H40L32 68L25 62H11z" fill="#FFC531"/><rect x="12" y="63" width="76" height="12" rx="6" fill="#5A2816"/><path d="M22 67h6M40 70h8M60 67h7M74 70h5" stroke="#7E3D22" stroke-width="2" stroke-linecap="round"/><path d="M14 77H86Q86 89 72 89H28Q14 89 14 77z" fill="#E2933A"/></g><g id="burger2"><g transform="translate(0 -6)"><path d="M12 42C12 14 30 6 50 6S88 14 88 42Q88 46 84 46H16Q12 46 12 42z" fill="#EE9F3E"/><path d="M22 32C24 16 38 10 52 10" fill="none" stroke="#F8C878" stroke-width="5" stroke-linecap="round"/><g fill="#FFF1D2"><ellipse cx="34" cy="26" rx="2.6" ry="1.4" transform="rotate(-20 34 26)"/><ellipse cx="48" cy="20" rx="2.6" ry="1.4"/><ellipse cx="62" cy="24" rx="2.6" ry="1.4" transform="rotate(20 62 24)"/><ellipse cx="42" cy="33" rx="2.6" ry="1.4" transform="rotate(10 42 33)"/><ellipse cx="57" cy="32" rx="2.6" ry="1.4" transform="rotate(-10 57 32)"/><ellipse cx="70" cy="34" rx="2.6" ry="1.4" transform="rotate(25 70 34)"/></g></g><path d="M10 42q5-5 10 0t10 0t10 0t10 0t10 0t10 0t10 0t10 0L88 48H12z" fill="#6DBE3E"/><rect x="12" y="47" width="76" height="12" rx="6" fill="#5A2816"/><path d="M22 51h6M40 54h8M60 51h7M74 54h5" stroke="#7E3D22" stroke-width="2" stroke-linecap="round"/><path d="M11 58H89L84 64L76 60L68 67L60 60H40L32 66L25 60H11z" fill="#FFC531"/><rect x="12" y="62" width="76" height="12" rx="6" fill="#5A2816"/><path d="M22 66h6M40 69h8M60 66h7M74 69h5" stroke="#7E3D22" stroke-width="2" stroke-linecap="round"/><path d="M11 73H89L84 79L76 75L68 82L60 75H40L32 81L25 75H11z" fill="#FFC531"/><path d="M14 78H86Q86 90 72 90H28Q14 90 14 78z" fill="#E2933A"/></g><g id="burgerbacon"><path d="M12 46C12 18 30 10 50 10S88 18 88 46Q88 50 84 50H16Q12 50 12 46z" fill="#EE9F3E"/><path d="M22 36C24 20 38 14 52 14" fill="none" stroke="#F8C878" stroke-width="5" stroke-linecap="round"/><g fill="#FFF1D2"><ellipse cx="34" cy="26" rx="2.6" ry="1.4" transform="rotate(-20 34 26)"/><ellipse cx="48" cy="20" rx="2.6" ry="1.4"/><ellipse cx="62" cy="24" rx="2.6" ry="1.4" transform="rotate(20 62 24)"/><ellipse cx="42" cy="33" rx="2.6" ry="1.4" transform="rotate(10 42 33)"/><ellipse cx="57" cy="32" rx="2.6" ry="1.4" transform="rotate(-10 57 32)"/><ellipse cx="70" cy="34" rx="2.6" ry="1.4" transform="rotate(25 70 34)"/></g><path d="M10 52q5-5 10 0t10 0t10 0t10 0t10 0t10 0t10 0t10 0L88 58H12z" fill="#6DBE3E"/><path d="M11 57H89L84 63L76 59L68 66L60 59H40L32 65L25 59H11z" fill="#FFC531"/><path d="M12 62q8-4 16 0t16 0t16 0t16 0t12 0v4q-6-3-12 0t-16 0t-16 0t-16 0t-16 0z" fill="#B8432B"/><path d="M14 63q8-3 15 0" stroke="#F2B49A" stroke-width="1.5" fill="none"/><rect x="12" y="66" width="76" height="12" rx="6" fill="#5A2816"/><path d="M22 70h6M40 73h8M60 70h7M74 73h5" stroke="#7E3D22" stroke-width="2" stroke-linecap="round"/><path d="M14 80H86Q86 92 72 92H28Q14 92 14 80z" fill="#E2933A"/></g>
+    <g id="drink"><path d="M58 4l-4 26" stroke="#FFD000" stroke-width="4" stroke-linecap="round"/><path d="M28 30H72L66 94H34z" fill="#E3201B"/><path d="M30 52H70L69 64H31z" fill="#FFFBEA"/><path d="M41 54h4l2 8 2-8h2l2 8 2-8h4l-4 9h-3l-2-6-2 6h-3z" fill="#E3201B"/><rect x="25" y="25" width="50" height="7" rx="3" fill="#EFE7D6"/><path d="M36 70l-2 18" stroke="#FF6B5B" stroke-width="3" stroke-linecap="round"/></g><g id="juice"><path d="M30 24H70L65 92H35z" fill="#F4EFE6" opacity=".9"/><path d="M32 40H68L65 90H35z" fill="#FF9F1C"/><rect x="38" y="46" width="8" height="8" rx="2" fill="#FFE3B8" opacity=".8"/><rect x="52" y="54" width="8" height="8" rx="2" fill="#FFE3B8" opacity=".8"/><circle cx="68" cy="28" r="10" fill="#FFB43C"/><circle cx="68" cy="28" r="7" fill="#FFD27A"/><path d="M50 4v30" stroke="#E3201B" stroke-width="4" stroke-linecap="round"/></g>
+    <g id="fries"><g fill="#FFCD3C" stroke="#E8A21E" stroke-width="1.2"><rect x="28" y="14" width="7" height="40" rx="2" transform="rotate(-10 31 34)"/><rect x="37" y="8" width="7" height="44" rx="2" transform="rotate(-4 40 30)"/><rect x="46" y="6" width="7" height="46" rx="2"/><rect x="55" y="9" width="7" height="44" rx="2" transform="rotate(5 58 31)"/><rect x="64" y="15" width="7" height="40" rx="2" transform="rotate(11 67 35)"/></g><path d="M22 42H78L71 92H29z" fill="#E3201B"/><path d="M22 42H78l-1 6H23z" fill="#B5150F"/><path d="M38 60h6l3 12 3-12h2l3 12 3-12h6l-6 18h-4l-3-10-3 10h-4z" fill="#FFD000"/></g>
+    <g id="ando">
+  <ellipse cx="110" cy="268" rx="62" ry="8" fill="rgba(94,5,8,.25)"/>
+  <g class="ando-box"><rect x="28" y="70" width="164" height="120" rx="12" fill="#F2131B"/><rect x="28" y="70" width="164" height="22" rx="10" fill="#B80D13"/><circle cx="110" cy="140" r="34" fill="#FFD60A"/><path d="M86 124h12l6 24 7-24h3l7 24 6-24h12l-14 38h-7l-6-21-6 21h-7z" fill="#F2131B"/></g>
+  <g class="ando-legs"><path class="leg l" d="M96 196v54" stroke="#2B3A67" stroke-width="20" stroke-linecap="round"/><path class="leg r" d="M124 196v54" stroke="#2B3A67" stroke-width="20" stroke-linecap="round"/><ellipse cx="92" cy="258" rx="17" ry="8" fill="#FFFDF2" stroke="#2B0A06" stroke-width="3"/><ellipse cx="128" cy="258" rx="17" ry="8" fill="#FFFDF2" stroke="#2B0A06" stroke-width="3"/></g>
+  <path d="M76 122q0-22 34-22t34 22v78H76z" fill="#FFD60A"/>
+  <path d="M90 104l20 18 20-18" fill="none" stroke="#B80D13" stroke-width="5" stroke-linecap="round"/>
+  <path d="M80 112l-22 22" stroke="#FFD60A" stroke-width="16" stroke-linecap="round"/><path d="M80 112l-22 22" stroke="#C98B5A" stroke-width="0"/>
+  <circle cx="56" cy="136" r="9" fill="#C98B5A"/>
+  <g class="ando-wave"><path d="M140 112l22-30" stroke="#FFD60A" stroke-width="16" stroke-linecap="round"/><circle cx="164" cy="78" r="9" fill="#C98B5A"/></g>
+  <path d="M96 116v14M124 116v14" stroke="#2B0A06" stroke-width="3" opacity=".25"/>
+  <circle cx="110" cy="66" r="30" fill="#C98B5A"/>
+  <circle cx="99" cy="64" r="3.5" fill="#2B0A06"/><circle cx="121" cy="64" r="3.5" fill="#2B0A06"/>
+  <path d="M100 78q10 9 20 0" fill="none" stroke="#2B0A06" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="92" cy="74" r="4" fill="#F28B7A" opacity=".6"/><circle cx="128" cy="74" r="4" fill="#F28B7A" opacity=".6"/>
+  <path d="M78 54q2-26 32-26t32 26z" fill="#F2131B"/><path d="M110 50h44q4 0 4 4t-4 4h-44z" fill="#B80D13"/><circle cx="110" cy="30" r="5" fill="#FFD60A"/>
+</g>
+  </defs>
+</svg>
+
+<div class="aviso" role="note"><div class="wrap"><b>Projeto escolar.</b> Wec Donalds é um trocadilho criado por alunos para um trabalho da escola. Não tem nenhuma ligação com o McDonald's.</div></div>
+
+<div class="stagebg">
+  <div class="rays" aria-hidden="true"></div>
+  <span class="spark" style="left:8%;top:30%" aria-hidden="true"></span><span class="spark" style="left:46%;top:18%;animation-delay:-1s" aria-hidden="true"></span><span class="spark" style="left:30%;top:80%;animation-delay:-2s" aria-hidden="true"></span><span class="spark" style="left:90%;top:70%;animation-delay:-.5s" aria-hidden="true"></span>
+  <header class="wrap top">
+    <div class="brand"><svg viewBox="0 0 300 300" aria-hidden="true"><circle cx="150" cy="150" r="146" fill="#FFD60A"/><path d="M62 92h40l20 82 22-82h12l22 82 20-82h40l-44 126h-24l-20-72-20 72h-24z" fill="#F2131B"/></svg>Wec Donalds</div>
+    <div class="actions"><button class="motion" id="motion" aria-pressed="true">Animações: ligadas</button><button class="cartbtn" id="open-cart" aria-label="Abrir carrinho">Carrinho <b id="badge">0</b></button></div>
+  </header>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <h1>O hambúrguer que <span>vale um W!</span></h1>
+        <p>Lanches feitos na hora, batata crocante e bebida gelada. Monte seu combo, ajuste do seu jeito e pague no Pix.</p>
+        <div class="ctas"><button class="btn" id="hero-combo">Montar meu combo</button><button class="btn ghost" id="hero-menu">Ver cardápio</button></div>
+      </div>
+      <div class="stage">
+        <div class="ring" aria-hidden="true"></div>
+        <svg class="fl f1" viewBox="0 0 100 100" aria-hidden="true"><use href="#burger"/></svg><svg class="fl f2" viewBox="0 0 100 100" aria-hidden="true"><use href="#fries"/></svg><svg class="fl f3" viewBox="0 0 100 100" aria-hidden="true"><use href="#drink"/></svg><svg class="fl f4" viewBox="0 0 100 100" aria-hidden="true"><use href="#burgerbacon"/></svg>
+        <svg class="logoW" viewBox="0 0 300 300" role="img" aria-label="Selo Wec Donalds">
+          <circle cx="150" cy="150" r="146" fill="#FFD60A"/>
+          <circle cx="150" cy="150" r="128" fill="none" stroke="#F2131B" stroke-width="6"/>
+          <path d="M62 92h40l20 82 22-82h12l22 82 20-82h40l-44 126h-24l-20-72-20 72h-24z" fill="#F2131B"/>
+          <path id="arcb" d="M70 230a90 90 0 0 0 160 0" fill="none"/>
+          <text font-family="Lilita One,Arial Black,sans-serif" font-size="26" fill="#5E0508" letter-spacing="3"><textPath href="#arcb" startOffset="50%" text-anchor="middle">WEC DONALDS</textPath></text>
+        </svg>
+      </div>
+    </section>
+  </div>
+  <svg class="wave" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30Q100 0 200 30T400 30T600 30T800 30T1000 30T1200 30V60H0z" fill="#FFD60A"/></svg>
+</div>
+
+<div class="dots">
+  <div class="wrap"><ul class="feats" aria-label="Destaques"><li><b>Feito na hora</b>Montado quando você pede</li><li><b>Pix na hora</b>Pague pelo app do seu banco</li><li><b>Entrega por Andoboy</b>Levamos a pé até você</li></ul></div>
+
+  <div class="parade" aria-hidden="true"><div class="track" id="track"></div><div class="track rev" id="track2"></div></div>
+
+  <nav class="tabs" aria-label="Categorias"><div class="wrap" id="tabs"></div></nav>
+
+  <main class="wrap" id="cardapio">
+    <h2 id="cat-title">Lanches</h2>
+    <p class="note">Itens e preços de exemplo. Toque num lanche pra ver detalhes e tirar ingredientes.</p>
+    <div class="grid" id="grid"></div>
+
+    <section class="andoboy" aria-labelledby="ando-title">
+      <div class="ando-art"><svg class="ando-svg" viewBox="0 0 220 280" role="img" aria-label="Andoboy, o entregador a pé, com a caixa de entrega nas costas">
+  <ellipse cx="110" cy="268" rx="62" ry="8" fill="rgba(94,5,8,.25)"/>
+  <g class="ando-box"><rect x="28" y="70" width="164" height="120" rx="12" fill="#F2131B"/><rect x="28" y="70" width="164" height="22" rx="10" fill="#B80D13"/><circle cx="110" cy="140" r="34" fill="#FFD60A"/><path d="M86 124h12l6 24 7-24h3l7 24 6-24h12l-14 38h-7l-6-21-6 21h-7z" fill="#F2131B"/></g>
+  <g class="ando-legs"><path class="leg l" d="M96 196v54" stroke="#2B3A67" stroke-width="20" stroke-linecap="round"/><path class="leg r" d="M124 196v54" stroke="#2B3A67" stroke-width="20" stroke-linecap="round"/><ellipse cx="92" cy="258" rx="17" ry="8" fill="#FFFDF2" stroke="#2B0A06" stroke-width="3"/><ellipse cx="128" cy="258" rx="17" ry="8" fill="#FFFDF2" stroke="#2B0A06" stroke-width="3"/></g>
+  <path d="M76 122q0-22 34-22t34 22v78H76z" fill="#FFD60A"/>
+  <path d="M90 104l20 18 20-18" fill="none" stroke="#B80D13" stroke-width="5" stroke-linecap="round"/>
+  <path d="M80 112l-22 22" stroke="#FFD60A" stroke-width="16" stroke-linecap="round"/><path d="M80 112l-22 22" stroke="#C98B5A" stroke-width="0"/>
+  <circle cx="56" cy="136" r="9" fill="#C98B5A"/>
+  <g class="ando-wave"><path d="M140 112l22-30" stroke="#FFD60A" stroke-width="16" stroke-linecap="round"/><circle cx="164" cy="78" r="9" fill="#C98B5A"/></g>
+  <path d="M96 116v14M124 116v14" stroke="#2B0A06" stroke-width="3" opacity=".25"/>
+  <circle cx="110" cy="66" r="30" fill="#C98B5A"/>
+  <circle cx="99" cy="64" r="3.5" fill="#2B0A06"/><circle cx="121" cy="64" r="3.5" fill="#2B0A06"/>
+  <path d="M100 78q10 9 20 0" fill="none" stroke="#2B0A06" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="92" cy="74" r="4" fill="#F28B7A" opacity=".6"/><circle cx="128" cy="74" r="4" fill="#F28B7A" opacity=".6"/>
+  <path d="M78 54q2-26 32-26t32 26z" fill="#F2131B"/><path d="M110 50h44q4 0 4 4t-4 4h-44z" fill="#B80D13"/><circle cx="110" cy="30" r="5" fill="#FFD60A"/>
+</svg></div>
+      <div>
+        <span class="eyebrow">Entrega Wec Donalds</span>
+        <h2 id="ando-title">Aqui não tem motoboy. Tem <span>Andoboy!</span></h2>
+        <p>Nosso entregador vai a pé, com a caixa nas costas, até a sua sala. Ele não tem moto, não tem buzina, mas tem muita vontade de entregar seu lanche quentinho.</p>
+        <ul class="ando-list"><li>Entrega dentro da escola</li><li>Você diz a turma e onde está</li><li>Mostre o código do pedido pra ele</li></ul>
+      </div>
+    </section>
+
+    <section class="combo" id="combo" aria-labelledby="combo-title">
+      <div class="rays" aria-hidden="true"></div>
+      <div><h2 id="combo-title">Monte seu combo</h2><p class="note" style="margin:0">Escolha um de cada e ganhe R$ 3 de desconto.</p></div>
+      <div class="steps" id="steps"></div>
+      <div class="combofoot"><div>Combo: <s id="combo-old"></s> <b class="price" id="combo-price"></b></div><button class="btn" id="add-combo">Adicionar combo</button></div>
+    </section>
+  </main>
+</div>
+
+<footer class="rodape"><div class="wrap"><b>Wec Donalds</b>Lanchonete fictícia feita para um projeto escolar. Não é o McDonald's e não tem relação com a marca McDonald's.</div></footer>
+<div class="shade" id="shade" hidden></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-name" hidden>
+  <button class="x" id="m-close" aria-label="Fechar">×</button>
+  <svg class="big" id="m-art" viewBox="0 0 100 100" aria-hidden="true"></svg>
+  <h3 id="m-name"></h3>
+  <p id="m-desc" style="margin:0;color:var(--muted)"></p>
+  <div id="m-ings"></div>
+  <div class="combofoot">
+    <div class="qty"><button id="m-minus" aria-label="Menos">−</button><output id="m-qty">1</output><button id="m-plus" aria-label="Mais">+</button></div>
+    <button class="btn red" id="m-add">Adicionar</button>
+  </div>
+</div>
+<aside class="drawer" id="drawer" aria-label="Carrinho" hidden>
+  <button class="x" id="d-close" aria-label="Fechar carrinho" style="top:calc(12px + env(safe-area-inset-top,0px))">×</button>
+  <h3>Seu pedido</h3>
+  <div class="lines" id="lines"></div>
+  <p class="note" style="margin:8px 0 0">Pedido de um projeto escolar. Não é o McDonald's.</p>
+  <div class="sum"><span>Total</span><span id="d-total">R$ 0,00</span></div>
+  <button class="btn" id="checkout">Compre aqui</button>
+</aside>
+<div class="pay" id="pay" role="dialog" aria-modal="true" aria-labelledby="p-title" hidden>
+  <button class="x" id="p-close" aria-label="Fechar pagamento">×</button>
+  <div id="p-step1" style="display:grid;gap:14px">
+    <div class="stepsline"><span class="on">1. Seus dados</span><span>2. Pix</span><span>3. Pronto</span></div>
+    <h3 id="p-title">Finalizar pedido</h3>
+    <div>Total <span class="big-total" id="p-total1"></span></div>
+    <label class="field" for="p-nome">Seu nome<input id="p-nome" autocomplete="name" placeholder="Ex.: Ana Souza"></label>
+    <label class="field" for="p-turma">Sua turma<input id="p-turma" required placeholder="Ex.: 8º B"></label>
+    <label class="field" for="p-local">Onde você está na escola<input id="p-local" required placeholder="Ex.: sala 12, quadra, cantina"><small>O Andoboy vai até esse lugar entregar.</small></label>
+    <div class="err" id="p-err"></div>
+    <button class="btn red" id="p-gen">Gerar Pix</button>
+  </div>
+  <div id="p-step2" hidden style="display:grid;gap:14px">
+    <div class="stepsline"><span>1. Seus dados</span><span class="on">2. Pix</span><span>3. Pronto</span></div>
+    <h3>Pague com Pix</h3>
+    <div>Total <span class="big-total" id="p-total2"></span></div>
+    <div class="warn" id="p-nokey" hidden><b>Pix ainda não configurado.</b> Falta colocar a chave Pix de quem vai receber. Por enquanto, este é só o visual de teste.</div>
+    <div class="qrbox" id="p-qr"></div>
+    <div class="copy" id="p-copybox"><b>Pix copia e cola</b><textarea id="p-code" readonly aria-label="Código Pix copia e cola"></textarea><button class="btn" id="p-copy">Copiar código</button></div>
+    <p class="note" style="margin:0">Abra o app do seu banco, escolha Pix e escaneie o QR Code ou cole o código. O valor já vem preenchido.</p>
+    <button class="btn red" id="p-done">Já paguei</button>
+    <button class="linkbtn" id="p-back">Voltar</button>
+  </div>
+  <div id="p-step3" hidden style="display:grid;gap:14px">
+    <div class="stepsline"><span>1. Seus dados</span><span>2. Pix</span><span class="on">3. Pronto</span></div>
+    <h3>Pedido recebido!</h3>
+    <p style="margin:0">Seu código do pedido é:</p>
+    <div><span class="code" id="p-order"></span></div>
+    <p style="margin:0" id="p-where"></p>
+    <svg class="mini-ando ando-svg" viewBox="0 0 220 280" aria-hidden="true"><use href="#ando"/></svg>
+    <p class="note" style="margin:0">Seu pedido já chegou pra gente. Assim que o Pix cair, preparamos o lanche e o Andoboy leva até você.</p>
+    <a class="btn" id="p-wa" href="#" target="_blank" rel="noopener">Mandar no WhatsApp (opcional)</a>
+    <p class="note" style="margin:0">Se quiser, mande também no WhatsApp. Dúvidas: <b style="user-select:all">(71) 98125-1166</b>.</p>
+    <button class="linkbtn" id="p-new">Fazer outro pedido</button>
+  </div>
+</div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>if(!window.qrcode)document.write('<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"><\/script>')</script>
+<script>
+const cats=[{id:"lanches",nome:"Lanches"},{id:"acomp",nome:"Acompanhamentos"},{id:"bebidas",nome:"Bebidas"}];
+const items=[
+  {id:"wburger",cat:"lanches",nome:"W Burger",desc:"O clássico da casa.",preco:15,icon:"burger",ings:["Pão","Carne","Queijo","Alface","Tomate","Molho W"],tag:"Mais pedido"},
+  {id:"duplo",cat:"lanches",nome:"W Duplo",desc:"Duas carnes e queijo em dobro.",preco:20,icon:"burger2",ings:["Pão","2 carnes","2 queijos","Cebola","Molho W"]},
+  {id:"bacon",cat:"lanches",nome:"W Bacon",desc:"Carne, queijo e bacon crocante.",preco:18,icon:"burgerbacon",ings:["Pão","Carne","Queijo","Bacon","Picles","Molho W"]},
+  {id:"kids",cat:"lanches",nome:"W Kids",desc:"Pequeno, com queijo.",preco:10,icon:"burger",ings:["Pão","Carne","Queijo"]},
+  {id:"batata",cat:"acomp",nome:"Batata Wec",desc:"Crocante, com sal na medida.",preco:8,icon:"fries",ings:["Sal"]},
+  {id:"batatag",cat:"acomp",nome:"Batata Wec Grande",desc:"Pra dividir (ou não).",preco:11,icon:"fries",ings:["Sal"]},
+  {id:"refri",cat:"bebidas",nome:"Refri",desc:"Lata gelada.",preco:5,icon:"drink",ings:[]},
+  {id:"suco",cat:"bebidas",nome:"Suco natural",desc:"Laranja ou maracujá.",preco:6,icon:"juice",ings:["Gelo","Açúcar"]}
+];
+const $=id=>document.getElementById(id);
+const fmt=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const byId=id=>items.find(i=>i.id===id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const icons=["burger","fries","burger2","drink","burgerbacon","juice","burger","fries"];
+const strip=a=>[...a,...a,...a,...a].map(n=>`<svg viewBox="0 0 100 100"><use href="#${n}"/></svg>`).join("");
+$("track").innerHTML=strip(icons);$("track2").innerHTML=strip(["burger2","burger","burgerbacon","burger"]);
+
+let cat="lanches";
+function renderTabs(){$("tabs").innerHTML=cats.map(c=>`<button class="tab" id="tab-${c.id}" data-cat="${c.id}" aria-pressed="${c.id===cat}">${c.nome}</button>`).join("")}
+function renderGrid(){
+  $("cat-title").textContent=cats.find(c=>c.id===cat).nome;
+  $("grid").innerHTML=items.filter(i=>i.cat===cat).map(i=>`<button class="item" id="item-${i.id}" data-id="${i.id}">${i.tag?`<span class="tag">${i.tag}</span>`:""}<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${i.icon}"/></svg><h3>${i.nome}</h3><p>${i.desc}</p><span class="price">${fmt(i.preco)}</span></button>`).join("");
+}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;cat=b.dataset.cat;renderTabs();renderGrid()});
+renderTabs();renderGrid();
+
+const cart=[];
+function updateCart(){
+  const n=cart.reduce((a,l)=>a+l.qty,0),t=cart.reduce((a,l)=>a+l.qty*l.preco,0);
+  $("badge").textContent=n;const bb=$("open-cart");bb.classList.remove("pop");void bb.offsetWidth;bb.classList.add("pop");$("d-total").textContent=fmt(t);
+  $("lines").innerHTML=cart.length?cart.map((l,i)=>`<div class="line"><span><b>${l.qty}× ${esc(l.nome)}</b></span><button class="rm" data-i="${i}" aria-label="Remover ${esc(l.nome)}">Remover</button><small>${esc(l.extra)||"Do jeito da casa"} · ${fmt(l.qty*l.preco)}</small></div>`).join(""):`<p class="empty">Seu carrinho está vazio.<br>Escolha um lanche no cardápio.</p>`;
+}
+$("lines").addEventListener("click",e=>{const b=e.target.closest(".rm");if(!b)return;cart.splice(+b.dataset.i,1);updateCart()});
+
+let t;function toast(m){$("toast").textContent=m;$("toast").hidden=false;clearTimeout(t);t=setTimeout(()=>$("toast").hidden=true,2400)}
+function closeAll(){$("shade").hidden=true;$("modal").hidden=true;$("drawer").hidden=true;$("pay").hidden=true}
+$("shade").onclick=closeAll;$("m-close").onclick=closeAll;$("d-close").onclick=closeAll;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
+
+let calm=false;
+try{const v=localStorage.getItem("wec-motion");if(v)calm=v==="off"}catch(e){}
+function applyMotion(){document.documentElement.classList.toggle("calm",calm);$("motion").textContent="Animações: "+(calm?"desligadas":"ligadas");$("motion").setAttribute("aria-pressed",String(!calm))}
+$("motion").onclick=()=>{calm=!calm;try{localStorage.setItem("wec-motion",calm?"off":"on")}catch(e){}applyMotion();toast(calm?"Animações desligadas":"Animações ligadas!")};
+applyMotion();
+function buildArt(icon){
+  const art=$("m-art"),src=document.getElementById(icon),kids=[...src.children];
+  art.innerHTML="";
+  kids.forEach((k,i)=>{const g=document.createElementNS("http://www.w3.org/2000/svg","g");g.setAttribute("class","drop");g.style.animationDelay=((kids.length-1-i)*0.09)+"s";g.appendChild(k.cloneNode(true));art.appendChild(g)});
+}
+function fly(fromEl,icon,delay=0){
+  if(calm)return;
+  const a=fromEl.getBoundingClientRect(),b=$("open-cart").getBoundingClientRect();
+  const el=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  el.setAttribute("viewBox","0 0 100 100");el.setAttribute("class","flyer");
+  el.innerHTML=`<use href="#${icon}"/>`;
+  const sx=a.left+a.width/2-40,sy=a.top+a.height/2-40,ex=b.left+b.width/2-40,ey=b.top+b.height/2-40;
+  el.style.left=sx+"px";el.style.top=sy+"px";document.body.appendChild(el);
+  const dx=ex-sx,dy=ey-sy;
+  el.animate([{transform:"translate(0,0) scale(1) rotate(0)"},{transform:`translate(${dx*0.5}px,${dy*0.5-120}px) scale(.8) rotate(-200deg)`},{transform:`translate(${dx}px,${dy}px) scale(.2) rotate(-360deg)`,opacity:.6}],{duration:800,delay,easing:"cubic-bezier(.5,0,.5,1)",fill:"both"}).onfinish=()=>el.remove();
+}
+let cur,qty=1;
+$("grid").addEventListener("click",e=>{const b=e.target.closest(".item");if(!b)return;openItem(byId(b.dataset.id))});
+function openItem(it){
+  cur=it;qty=1;$("m-qty").textContent=1;
+  buildArt(it.icon);$("m-name").textContent=it.nome;$("m-desc").textContent=it.desc+" "+fmt(it.preco);
+  $("m-ings").innerHTML=it.ings.length?`<b style="font-size:14px">Ingredientes (desmarque pra tirar)</b>`+it.ings.map((g,i)=>`<label class="chk"><input type="checkbox" id="ing-${i}" checked data-ing="${esc(g)}">${esc(g)}</label>`).join(""):"";
+  $("shade").hidden=false;$("modal").hidden=false;$("m-add").focus();
+}
+$("m-minus").onclick=()=>{qty=Math.max(1,qty-1);$("m-qty").textContent=qty};
+$("m-plus").onclick=()=>{qty=Math.min(20,qty+1);$("m-qty").textContent=qty};
+$("m-add").onclick=()=>{
+  const sem=[...document.querySelectorAll("#m-ings input:not(:checked)")].map(x=>x.dataset.ing);
+  cart.push({id:cur.id,nome:cur.nome,preco:cur.preco,qty,extra:sem.length?"Sem "+sem.join(", ").toLowerCase():""});
+  fly($("m-art"),cur.icon);updateCart();closeAll();toast(cur.nome+" foi pro carrinho");
+};
+
+const steps=[["lanches","1. Lanche"],["acomp","2. Acompanhamento"],["bebidas","3. Bebida"]];
+$("steps").innerHTML=steps.map(([c,t])=>`<div class="step"><h4>${t}</h4>${items.filter(i=>i.cat===c).map((i,k)=>`<label class="opt"><input type="radio" name="c-${c}" id="c-${i.id}" value="${i.id}" ${k===0?"checked":""}><span>${i.nome}</span><small>${fmt(i.preco)}</small></label>`).join("")}</div>`).join("");
+function comboSel(){return steps.map(([c])=>byId(document.querySelector(`input[name="c-${c}"]:checked`).value))}
+function renderCombo(){const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);$("combo-old").textContent=fmt(full);$("combo-price").textContent=fmt(full-3)}
+$("steps").addEventListener("change",renderCombo);renderCombo();
+$("add-combo").onclick=()=>{const s=comboSel(),full=s.reduce((a,i)=>a+i.preco,0);cart.push({tipo:"combo",ids:s.map(i=>i.id),nome:"Combo "+s[0].nome,preco:full-3,qty:1,extra:s[1].nome+" + "+s[2].nome});fly($("add-combo"),s[0].icon);fly($("add-combo"),s[1].icon,120);fly($("add-combo"),s[2].icon,240);updateCart();toast("Combo adicionado!")};
+$("hero-combo").onclick=()=>$("combo").scrollIntoView({behavior:"smooth"});
+$("hero-menu").onclick=()=>$("cardapio").scrollIntoView({behavior:"smooth"});
+
+$("open-cart").onclick=()=>{$("shade").hidden=false;$("drawer").hidden=false};
+
+const WHATS="5571981251166";
+const API="https://script.google.com/macros/s/AKfycbw7FLs9RIgxs1yWNpVnKp4XOIl8V3HL2sRlygN4L8d3Uplq986VrOeeDHVel0jq_vpS2Q/exec";
+const PIX={chave:"c9c3e0de-78b9-4fc6-9068-bb7f2a338ae7",nome:"WEC DONALDS",cidade:"SALVADOR"};
+function tlv(id,v){return id+String(v.length).padStart(2,"0")+v}
+function crc16(str){let c=0xFFFF;for(let k=0;k<str.length;k++){c^=str.charCodeAt(k)<<8;for(let i=0;i<8;i++)c=(c&0x8000)?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
+const limpa=(t,n)=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9 ]/g,"").trim().slice(0,n);
+function pixPayload(valor,txid){
+  const p=tlv("00","01")+tlv("26",tlv("00","br.gov.bcb.pix")+tlv("01",PIX.chave))+tlv("52","0000")+tlv("53","986")+tlv("54",valor.toFixed(2))+tlv("58","BR")+tlv("59",limpa(PIX.nome,25))+tlv("60",limpa(PIX.cidade,15))+tlv("62",tlv("05",txid))+"6304";
+  return p+crc16(p);
+}
+const total=()=>cart.reduce((a,l)=>a+l.qty*l.preco,0);
+let pedido=null;
+function payStep(n){["p-step1","p-step2","p-step3"].forEach((id,i)=>$(id).hidden=i!==n-1)}
+function openPay(){
+  if(!cart.length){toast("Adicione algum lanche primeiro.");return}
+  $("drawer").hidden=true;$("shade").hidden=false;$("pay").hidden=false;
+  $("p-total1").textContent=fmt(total());$("p-err").textContent="";payStep(1);$("p-nome").focus();
+}
+["p-nome","p-turma","p-local"].forEach(id=>$(id).addEventListener("input",()=>$("p-err").textContent=""));
+$("p-gen").onclick=async()=>{
+  const nome=$("p-nome").value.trim();
+  if(nome.length<2){$("p-err").textContent="Digite seu nome pra gente saber de quem é o pedido.";$("p-nome").focus();return}
+  const turma=$("p-turma").value.trim(),local=$("p-local").value.trim();
+  if(!turma){$("p-err").textContent="Digite sua turma pro Andoboy te achar.";$("p-turma").focus();return}
+  if(!local){$("p-err").textContent="Diga onde você está na escola pro Andoboy entregar.";$("p-local").focus();return}
+  const btn=$("p-gen");btn.disabled=true;btn.textContent="Registrando pedido...";
+  const itens=cart.map(l=>l.tipo==="combo"?{tipo:"combo",ids:l.ids,qty:l.qty,extra:l.extra}:{id:l.id,qty:l.qty,extra:l.extra});
+  let r;
+  try{
+    const res=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({acao:"novo",nome,turma,local,itens})});
+    r=await res.json();
+  }catch(e){r={ok:false,erro:"Sem conexão com a lanchonete. Confira sua internet e tente de novo."}}
+  btn.disabled=false;btn.textContent="Gerar Pix";
+  if(!r.ok){$("p-err").textContent=r.erro||"Não deu pra registrar o pedido. Tente de novo.";return}
+  pedido={codigo:r.codigo,nome,turma,local,itens:cart.map(l=>({...l})),total:r.total};
+  $("p-total2").textContent=fmt(pedido.total);
+  const code=pixPayload(pedido.total,"WEC"+r.codigo.slice(1));
+  $("p-code").value=code;
+  if(window.qrcode){const q=qrcode(0,"M");q.addData(code);q.make();$("p-qr").innerHTML=q.createSvgTag({cellSize:5,margin:2,scalable:true});$("p-qr").hidden=false}
+  else $("p-qr").hidden=true;
+  $("p-nokey").hidden=true;$("p-copybox").hidden=false;$("p-done").hidden=false;
+  payStep(2);
+};
+$("p-copy").onclick=()=>{
+  const v=$("p-code").value;
+  const sel=()=>{$("p-code").focus();$("p-code").select();toast("Código selecionado. Copie com Ctrl+C ou segure e copie.")};
+  try{navigator.clipboard.writeText(v).then(()=>toast("Código Pix copiado!"),sel)}catch(e){sel()}
+};
+$("p-back").onclick=()=>payStep(1);
+$("p-done").onclick=()=>{
+  fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({acao:"paguei",codigo:pedido.codigo})}).catch(()=>{});
+  const linhas=pedido.itens.map(l=>"- "+l.qty+"x "+l.nome+(l.extra?" ("+l.extra+")":""));
+  const msg=["Pedido "+pedido.codigo+" - Wec Donalds","Nome: "+pedido.nome,"Turma: "+pedido.turma,"Onde: "+pedido.local,"",...linhas,"","Total: "+fmt(pedido.total)+" (pago no Pix)"].join("\n");
+  $("p-wa").href="https://wa.me/"+WHATS+"?text="+encodeURIComponent(msg);
+  $("p-order").textContent=pedido.codigo;$("p-where").textContent="Entrega para "+pedido.nome+", turma "+pedido.turma+", em: "+pedido.local+".";payStep(3);cart.length=0;updateCart()};
+$("p-new").onclick=()=>{closeAll();$("p-nome").value="";$("p-turma").value="";$("p-local").value=""};
+$("p-close").onclick=closeAll;
+$("checkout").onclick=openPay;
+
+
+updateCart();
+</script>
+</body>
+</html>
