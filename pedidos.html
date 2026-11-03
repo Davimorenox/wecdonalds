@@ -61,7 +61,18 @@ input{font:600 17px var(--body);padding:12px 14px;border-radius:12px;border:2px 
 .acts button:disabled{opacity:.5}
 .empty{text-align:center;color:var(--muted);padding:40px 0;font-weight:700}
 .hint{font-size:14px;color:var(--muted);margin:0}
-@media (max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stock{background:var(--cream);border-radius:18px;padding:14px 16px;margin-bottom:16px;box-shadow:0 4px 0 var(--red-dk);display:grid;gap:10px}
+.stock h2{margin:0;font-family:var(--display);font-weight:400;color:var(--red);font-size:24px}
+.alerta{background:#FFE1DF;color:#7A0B07;border-radius:12px;padding:10px 12px;font-weight:800}
+.alerta.ok{background:#E3F6EA;color:#14532D}
+.srow{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;border-top:2px dotted #F3D9A0;padding-top:8px}
+.srow b{font-size:16px}.srow .q{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.srow .q.low{color:var(--wait)}.srow .q.zero{color:var(--red)}
+.sadd{grid-column:1/-1;display:flex;gap:8px}
+.sadd input{flex:1;min-width:0;padding:8px 10px;font-size:15px}
+.sadd button{border:0;border-radius:10px;padding:8px 14px;font-weight:800;color:#fff;background:var(--paid)}
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 18px}
+@media (max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}.sgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -85,6 +96,13 @@ input{font:600 17px var(--body);padding:12px 14px;border-radius:12px;border:2px 
     <div class="stat"><b id="s-done">0</b><span>Entregues hoje</span></div>
     <div class="stat"><b id="s-money">R$ 0</b><span>Vendido hoje</span></div>
   </div>
+  <section class="stock" aria-labelledby="stock-title">
+    <h2 id="stock-title">Estoque</h2>
+    <div class="alerta ok" id="alerta">Carregando estoque...</div>
+    <div class="sgrid" id="sgrid"></div>
+    <p class="hint">Quando acabar algum ingrediente, o site bloqueia sozinho os lanches que usam ele. Pra repor, digite quanto chegou e toque em Adicionar. Use número negativo pra tirar (por exemplo, -100 se caiu batata no chão).</p>
+  </section>
+  <div class="err" id="act-err"></div>
   <p class="hint">Confira no app do banco: nome de quem pagou, valor e horário. Se bater com o pedido, marque como pago.</p>
   <div class="filters" id="filters"></div>
   <div class="list" id="list"></div>
@@ -102,7 +120,27 @@ const filtros=["Ativos","Aguardando Pix","Pago","Entregue","Cancelado","Todos"];
 function renderFiltros(){$("filters").innerHTML=filtros.map(f=>`<button data-f="${f}" aria-pressed="${f===filtro}">${f}</button>`).join("")}
 $("filters").onclick=e=>{const b=e.target.closest("button");if(!b)return;filtro=b.dataset.f;renderFiltros();render()};
 
+const LIMITE={pao:5,carne:450,queijo:5,batata:300,coca:600};
+let estoque=[];
+function fmtQ(i){return i.qtd+" "+i.unidade}
+function renderEstoque(){
+  const zero=estoque.filter(i=>i.qtd<=0),pouco=estoque.filter(i=>i.qtd>0&&(i.chave.indexOf("carta_")===0?i.qtd<=1:i.qtd<(LIMITE[i.chave]||0)));
+  const a=$("alerta");
+  if(zero.length){a.className="alerta";a.textContent="Acabou: "+zero.map(i=>i.nome).join(", ")+". O site já bloqueia isso pros clientes."+(pouco.length?" Acabando: "+pouco.map(i=>i.nome+" ("+fmtQ(i)+")").join(", ")+".":"")}
+  else if(pouco.length){a.className="alerta";a.textContent="Está acabando: "+pouco.map(i=>i.nome+" ("+fmtQ(i)+")").join(", ")+"."}
+  else{a.className="alerta ok";a.textContent="Estoque em dia."}
+  $("sgrid").innerHTML=estoque.map(i=>{const low=i.qtd<=0?"zero":pouco.includes(i)?"low":"";return `<div class="srow"><b>${esc(i.nome)}</b><span class="q ${low}">${esc(fmtQ(i))}</span><form class="sadd" data-k="${esc(i.chave)}"><input type="number" inputmode="numeric" id="add-${esc(i.chave)}" aria-label="Quantidade de ${esc(i.nome)} pra adicionar" placeholder="+ ${esc(i.unidade)}"><button type="submit">Adicionar</button></form></div>`}).join("");
+}
+async function carregarEstoque(){try{const r=await (await fetch(API+"?acao=estoque&senha="+encodeURIComponent(senha))).json();if(r.ok){estoque=r.itens;renderEstoque()}}catch(e){}}
+$("sgrid").addEventListener("submit",async e=>{
+  e.preventDefault();const f=e.target.closest(".sadd");if(!f)return;const inp=f.querySelector("input"),q=Number(inp.value);
+  if(!q){$("act-err").textContent="Digite quanto adicionar.";inp.focus();return}
+  $("act-err").textContent="";const bt=f.querySelector("button");bt.disabled=true;
+  try{const r=await (await fetch(API+"?acao=addEstoque&senha="+encodeURIComponent(senha)+"&chave="+encodeURIComponent(f.dataset.k)+"&qtd="+q)).json();if(r.ok){estoque=r.itens;renderEstoque()}else $("act-err").textContent=r.erro||"Não deu pra atualizar."}catch(err){$("act-err").textContent="Sem conexão com a planilha."}
+  bt.disabled=false;
+});
 async function carregar(){
+  carregarEstoque();
   try{
     const r=await (await fetch(API+"?acao=lista&senha="+encodeURIComponent(senha))).json();
     if(!r.ok){if(r.erro==="senha"){sair("Senha errada.")}return}
@@ -137,7 +175,7 @@ $("list").onclick=async e=>{
   bt.disabled=true;
   try{
     const r=await (await fetch(API+"?acao=status&senha="+encodeURIComponent(senha)+"&codigo="+encodeURIComponent(bt.dataset.c)+"&status="+encodeURIComponent(bt.dataset.s))).json();
-    if(r.ok){const p=pedidos.find(x=>x.codigo===bt.dataset.c);if(p)p.status=bt.dataset.s;render()}else bt.disabled=false;
+    if(r.ok){$("act-err").textContent="";const p=pedidos.find(x=>x.codigo===bt.dataset.c);if(p)p.status=bt.dataset.s;render();carregarEstoque()}else{bt.disabled=false;$("act-err").textContent=r.erro||"Não deu pra mudar o pedido."}
   }catch(err){bt.disabled=false}
 };
 function entrar(){$("login").hidden=true;$("painel").hidden=false;$("bar").hidden=false;renderFiltros();carregar();clearInterval(timer);timer=setInterval(carregar,20000)}
